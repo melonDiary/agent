@@ -22,6 +22,7 @@ ipv6: true           # 开启 IPv6 总开关，关闭阻断所有 IPv6 链接和
 mode: rule            # 规则模式：rule（规则） / global（全局代理）/ direct（全局直连）/ script (脚本)
 log-level: info       # 设置日志输出级别 (5 个级别：silent / error / warning / info / debug）
 external-controller: 0.0.0.0:9093   #外部控制器,可以使用 RESTful API 来控制你的 clash 内核
+<<<<<<< HEAD
 global-client-fingerprint: chrome   #全局 TLS 指纹，优先低于 proxy 内的 client-fingerprint
                                     #可选： "chrome","firefox","safari","ios","random","none" options.
 
@@ -33,6 +34,17 @@ geox-url:
   geosite: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geosite.dat"
   mmdb: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/country.mmdb"
   asn: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/GeoLite2-ASN.mmdb"
+=======
+client-fingerprint: chrome   #全局 TLS 指纹，优先低于 proxy 内的 client-fingerprint
+                                    #可选： "chrome","firefox","safari","ios","random","none" options.
+
+# [数据库]
+geo-auto-update: false
+geo-update-interval: 24
+geox-url:
+  mmdb: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb"
+  asn: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
+>>>>>>> fc4dd1a (feat: 提交规则)
 
 profile:
   store-selected: true # 存储 select 选择记录
@@ -100,7 +112,11 @@ use:  &Lucky2 {type: select,   include-all: true }
 pr:   &Lucky3 {type: select,   proxies: [💖网速超快, 🟡延迟优选, DIRECT, 🧊香港节点, 🧊台湾节点, 🧊日本节点, 🧊韩国节点, 🧊新加坡节点, 🧊美国节点] }
 
 # 延迟优选策略组
+<<<<<<< HEAD
 auto: &Lucky4 {type: url-test, lazy: true,  url: http://www.gstatic.com/generate_204, interval: 900, include-all: true }
+=======
+auto: &Lucky4 {type: url-test, url: https://www.gstatic.com/generate_204, interval: 300, tolerance: 0, include-all: true }
+>>>>>>> fc4dd1a (feat: 提交规则)
 
 # 规则类型:domain
 d:    &Lucky5 {type: http,     behavior: domain,    interval: 86400}
