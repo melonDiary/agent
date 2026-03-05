@@ -1,0 +1,538 @@
+# ========================================================================================================
+# 配置名称: Clash 配置 - 改进版
+# 配置作者: Lucky (修订版本)
+# 最后更新: 2026-03-05
+# 
+# 📌 使用步骤：
+# 1. 在第 95 行填写你的 Sub-Store 订阅链接
+# 2. 根据你的操作系统调整 tun.stack 参数（Windows: gvisor, macOS: gvisor, Linux: system）
+# 3. 根据需要启用/禁用 Tun、DNS、Sniffer 功能
+# 4. 复制此配置到 Sparkle 应用中使用
+# ========================================================================================================
+
+# ========================================================================================================
+# [1] 端口配置 - Clash 监听端口
+# ========================================================================================================
+port: 7890                          # HTTP 代理端口
+socks-port: 7891                    # SOCKS5 代理端口
+redir-port: 7892                    # Linux 重定向端口
+mixed-port: 7893                    # 混合代理端口（同时支持 HTTP 和 SOCKS5）
+tproxy-port: 7894                   # Linux TPROXY 端口
+
+# ========================================================================================================
+# [2] 核心控制 - 基础代理设置
+# ========================================================================================================
+allow-lan: true                     # 允许局域网连接（可用于共享代理给其他设备）
+bind-address: "0.0.0.0"             # 绑定到所有 IP（可改为具体 IP 提高安全性，如: "192.168.1.100"）
+find-process-mode: strict           # 进程匹配模式：always（总是）/ strict（严格）/ off（关闭）
+
+ipv6: false                         # IPv6 总开关（关闭可减少干扰）
+mode: rule                          # 代理模式：rule（规则）/ global（全局代理）/ direct（全局直连）/ script（脚本）
+log-level: info                     # 日志级别：silent / error / warning / info / debug
+
+# ========================================================================================================
+# [3] 外部控制 - API 和 UI 访问
+# ========================================================================================================
+external-controller: 0.0.0.0:9093   # 外部控制器地址（RESTful API）
+external-ui: ui                     # 启用内置 UI
+external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/main.zip"
+
+# ========================================================================================================
+# [4] TLS 指纹 - 用于绕过 SNI 阻断
+# ========================================================================================================
+global-client-fingerprint: chrome   # 全局 TLS 指纹：chrome / firefox / safari / ios / random / none
+                                    # 优先级低于 proxy 内的 client-fingerprint
+
+# ========================================================================================================
+# [5] Meta 专属配置 - Mihomo 特有功能
+# ========================================================================================================
+geodata-mode: false                 # 使用地理数据库：false（使用 mmdb）/ true（使用 geoip.dat）
+geodata-loader: standard            # 地理数据加载器：standard（推荐，内置）/ fast（第三方，速度快但兼容性差）
+
+unified-delay: true                 # 统一延迟：保持所有策略组的延迟值一致
+tcp-concurrent: false               # TCP 并发：尝试所有 IP 地址并使用最快的握手连接
+
+# ========================================================================================================
+# [6] 性能和连接优化
+# ========================================================================================================
+keep-alive-interval: 30             # TCP Keep-Alive 间隔（秒）
+keep-alive-idle: 600                # Keep-Alive 空闲超时（秒）
+tcp-keep-alive: true                # 启用 TCP Keep-Alive
+
+connection-timeout: 5               # 连接超时（秒）
+read-timeout: 5                     # 读取超时（秒）
+write-timeout: 5                    # 写入超时（秒）
+dial-timeout: 10                    # 拨号超时（秒）
+
+disable-keep-alive: false           # 禁用 Keep-Alive（通常不需要）
+
+# ========================================================================================================
+# [7] 地理数据库配置 - 定期更新 GeoIP/GeoSite 数据
+# ========================================================================================================
+geo-auto-update: true               # 自动更新地理数据库
+geo-update-interval: 24             # 更新间隔（小时）
+
+geox-url:
+  geoip: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geoip.dat"
+  geosite: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geosite.dat"
+  mmdb: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/country.mmdb"
+  asn: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/GeoLite2-ASN.mmdb"
+
+# ========================================================================================================
+# [8] 配置持久化 - 保存状态信息
+# ========================================================================================================
+profile:
+  store-selected: true              # 存储手动选择的代理记录
+  store-fake-ip: true               # 持久化 Fake-IP 映射
+
+# ========================================================================================================
+# [9] 域名嗅探 - 自动识别应用访问的域名
+# ========================================================================================================
+sniffer:
+  enable: true                      # 启用域名嗅探
+  parse-pure-ip: true               # 将纯 IP 地址也通过嗅探映射到域名
+  
+  sniff:
+    TLS:                            # TLS 协议嗅探（HTTPS）
+      ports: [443, 8443]
+    HTTP:                           # HTTP 协议嗅探
+      ports: [80, 8080-8880]
+      override-destination: true    # 覆盖目标地址
+    QUIC:                           # QUIC 协议嗅探（HTTP/3）
+      ports: [443, 8443]
+
+# ========================================================================================================
+# [10] 虚拟网卡 (Tun) 配置 - 全局网络流量拦截
+# ========================================================================================================
+# ⚠️ 注意：Tun 需要管理员权限，不同系统需要不��配置
+tun:
+  enable: true                      # 启用虚拟网卡
+  
+  stack: mixed                      # 网络栈选择：
+                                    # Windows: gvisor（推荐）或 mixed
+                                    # macOS: gvisor（推荐）
+                                    # Linux: system（推荐）或 gvisor
+  
+  # DNS 劫持设置
+  dns-hijack:
+    - 'any:53'                      # 劫持所有 53 端口的 DNS 请求
+  
+  # 自动路由和接口检测
+  auto-route: true                  # 自动设置系统路由，将全局流量导入 Tun
+  auto-detect-interface: true       # 自动检测出口网卡
+  
+  # ⚠️ 高级选项 - 谨慎使用
+  # strict_route: true              # 严格路由：启用后设备无法被其他设备访问（仅单机场景）
+  # mtu: 1500                        # 最大传输单元（通常不需要修改）
+
+# ========================================================================================================
+# [11] DNS 配置 - 域名解析和 Fake-IP 设置
+# ========================================================================================================
+dns:
+  enable: true                      # 启用自定义 DNS（会接管系统 DNS）
+  ipv6: false                       # 禁用 IPv6 DNS 解析
+  prefer-h3: false                  # 优先使用 DoH-over-QUIC（如有兼容性问题改为 false）
+  
+  enhanced-mode: fake-ip            # 增强模式：fake-ip 或 redir-host
+  listen: 0.0.0.0:53                # DNS 监听地址
+  
+  # Fake-IP 配置
+  fake-ip-range: 198.18.0.1/16      # Fake-IP 地址池
+  
+  # Fake-IP 过滤列表 - 这些域名不会获取 Fake-IP，而是直接解析真实 IP
+  fake-ip-filter:
+    # 本地网络
+    - '*.lan'
+    - 'localhost.localdomain'
+    
+    # Windows 自动发现
+    - 'cable.auth.com'
+    - '*.msftconnecttest.com'
+    - '*.msftncsi.com'
+    
+    # Linux 自动发现
+    - 'network-test.debian.org'
+    - 'detectportal.firefox.com'
+    - 'resolver1.opendns.com'
+    
+    # 游戏平台
+    - '*.srv.nintendo.net'
+    - '*.stun.playstation.net'
+    - 'xbox.*.microsoft.com'
+    - '*.xboxlive.com'
+    
+    # 语音通话（STUN 服务器）
+    - 'stun.*'
+    - 'global.turn.twilio.com'
+    - 'global.stun.twilio.com'
+    
+    # 腾讯服务
+    - 'localhost.*.qq.com'
+    - 'localhost.*.weixin.qq.com'
+    - '*.logon.battlenet.com.cn'
+    - '*.logon.battle.net'
+    - '*.blzstatic.cn'
+    
+    # 音乐服务
+    - 'music.163.com'
+    - '*.music.163.com'
+    - '*.126.net'
+    - 'musicapi.taihe.com'
+    - 'music.taihe.com'
+    - 'songsearch.kugou.com'
+    - 'trackercdn.kugou.com'
+    - '*.kuwo.cn'
+    - 'api-jooxtt.sanook.com'
+    - 'api.joox.com'
+    - 'joox.com'
+    - 'y.qq.com'
+    - '*.y.qq.com'
+    - 'streamoc.music.tc.qq.com'
+    - 'mobileoc.music.tc.qq.com'
+    - 'isure.stream.qqmusic.qq.com'
+    - 'dl.stream.qqmusic.qq.com'
+    - 'aqqmusic.tc.qq.com'
+    - 'amobile.music.tc.qq.com'
+    - 'plus.music.163.com'
+    
+    # 其他音乐和视频
+    - '*.xiami.com'
+    - '*.music.migu.cn'
+    - 'music.migu.cn'
+    
+    # Go 包管理
+    - 'proxy.golang.org'
+    
+    # 视频加速
+    - '*.mcdn.bilivideo.cn'
+    
+    # 其他服务
+    - '*.cmpassport.com'
+    - 'id6.me'
+    - 'open.e.189.cn'
+    - 'mdn.open.wo.cn'
+    - 'opencloud.wostore.cn'
+    - 'auth.wosms.cn'
+    - '*.jegotrip.com.cn'
+    - '*.icitymobile.mobi'
+    - '*.pingan.com.cn'
+    - '*.cmbchina.com'
+    
+    # NTP 时间服务
+    - 'pool.ntp.org'
+    - '*.pool.ntp.org'
+    - 'ntp.*.com'
+    - 'time.*.com'
+    - 'ntp?.*.com'
+    - 'time?.*.com'
+    - 'time.*.gov'
+    - 'time.*.edu.cn'
+    - '*.ntp.org.cn'
+    
+    # Windows 域服务
+    - 'PDC._msDCS.*.*'
+    - 'DC._msDCS.*.*'
+    - 'GC._msDCS.*.*'
+
+  # ========================================================================================================
+  # DNS 服务器配置
+  # ========================================================================================================
+  
+  # 国内 DNS 服务器 - 用于解析国内域名
+  nameserver:
+    - 223.5.5.5                     # 阿里 DNS
+    - 119.29.29.29                  # 腾讯 DNS
+    - https://doh.pub/dns-query     # 腾讯 DoH
+    - https://dns.alidns.com/dns-query  # 阿里 DoH
+
+  # 国外 DNS 服务器 - 用于解析被污染的域名（在 fallback-filter 规则匹配时）
+  fallback:
+    - https://dns.google/dns-query  # Google DNS over HTTPS
+    - https://cloudflare-dns.com/dns-query  # Cloudflare DNS over HTTPS
+    - https://1.1.1.1/dns-query     # Cloudflare 1.1.1.1 DoH
+
+  # Fallback 过滤器 - 决定何时使用 fallback 中的国外 DNS
+  fallback-filter:
+    geoip: true                     # 启用 GEOIP 检查
+    geoip-code: CN                  # GEOIP 代码（CN 表示中国 IP）
+    ipcidr:                         # 私有 IP 范围（这些 IP 不会触发 fallback）
+      - 240.0.0.0/4                 # D 类地址
+
+
+# ========================================================================================================
+# [12] 代理提供者配置 - 定义代理数据源
+# ========================================================================================================
+# 🔴 重要：下面的 proxy-providers 中的 url 必须替换为你的实际订阅链接
+
+proxy-providers:
+  # 📌 第一步：用你的 Sub-Store 订阅链接替换这里的 url
+  # Sub-Store 链接格式示例：
+  # http://127.0.0.1:38324/download/collection/Your_Collection_Name?list=true&udp=true&tfo=true
+  
+  Subscribe:
+    type: http                      # 代理提供者类型：http（远程）/ file（本地）
+    interval: 86400                 # 更新间隔（秒），86400 = 24 小时
+    path: ./proxy-providers/Sub.yaml # 本地缓存路径
+    url: "将你的Sub-Store订阅链接放在这里"  # 📌 必须填写！
+    
+    # 健康检查配置
+    health-check:
+      enable: true                  # 启用健康检查
+      url: https://www.gstatic.com/generate_204  # 测试 URL
+      interval: 1800                # 检查间隔（秒），1800 = 30 分钟
+
+# ========================================================================================================
+# [13] 本地代理列表（当不使用代理提供者时使用）
+# ========================================================================================================
+# proxies: null                     # 代理从 proxy-providers 获取，此处留空
+
+
+# ========================================================================================================
+# [14] 策略组快捷定义 - YAML 锚点，简化后续配置
+# ========================================================================================================
+
+# 📋 代理提供者引用模板
+p:    &Lucky1 
+  type: http
+  interval: 86400
+  health-check: 
+    enable: true
+    url: https://www.gstatic.com/generate_204
+    interval: 1800
+
+# 🎯 手动选择策略组（包含所有代理）
+use:  &Lucky2 
+  type: select
+  include-all: true
+
+# 🔀 可选代理组（用于多个策略组的基础模板）
+pr:   &Lucky3 
+  type: select
+  include-all: true
+
+# ⚡ 自动延迟优选策略组（自动选择延迟最低的节点）
+auto: &Lucky4 
+  type: url-test
+  lazy: true
+  url: https://www.gstatic.com/generate_204
+  interval: 900                     # 检查间隔：900 秒 = 15 分钟
+  tolerance: 50                     # 延迟变化容限（ms）
+  include-all: true
+
+# 📍 规则提供者模板 - Domain 类型
+d:    &Lucky5 
+  type: http
+  behavior: domain
+  interval: 86400
+
+# 📍 规则提供者模板 - Classical 类型
+c:    &Lucky6 
+  type: http
+  behavior: classical
+  interval: 86400
+
+# 📍 规则提供者模板 - 本地文件
+e:    &Lucky7 
+  type: file
+  behavior: classical
+  interval: 86400
+
+# 📍 规则提供者模板 - IP-CIDR 类型
+i:    &Lucky8 
+  type: http
+  behavior: ipcidr
+  interval: 86400
+
+
+# ========================================================================================================
+# [15] 策略组定义 - 代理选择
+# ========================================================================================================
+proxy-groups:
+
+  # 🎯 主选策略 - 手动选择最快代理
+  - {name: 💖网速超快, <<: *Lucky2}
+
+  # ⚡ 自动选择 - 自动选择延迟最低的节点
+  - {name: 🟡延迟优选, <<: *Lucky4}
+
+  # 🍎 Apple 服务 - 用于 App Store、iCloud 等
+  - {name: 🍎苹果服务, <<: *Lucky3}
+
+  # 📹 哔哩哔哩视频 - 国内视频流媒体
+  - {name: 📹哔哩哔哩, <<: *Lucky3}
+
+  # 🟢 国内视频 - 其他国内视频服务
+  - {name: 🟢国内视频, <<: *Lucky3}
+
+  # 💽 国外视频 - YouTube、Netflix 等
+  - {name: 💽国外视频, <<: *Lucky3}
+
+  # 🌏 国外网站 - 除了视频的其他国外网站
+  - {name: 🌏国外网站, <<: *Lucky3}
+
+  # 💖 默认策略 - 未被规则匹配的流量
+  - {name: 💖法外狂徒, <<: *Lucky3}
+
+  # ========================= 地区节点分组 =========================
+  # 这些分组会自动筛选对应地区的节点
+  # 筛选规则会在订阅链接中的节点名称中查找对应关键词
+
+  # 🧊 香港节点 - 筛选包含这些关键词的节点
+  - {name: 🧊香港节点, <<: *Lucky4, filter: "香港|港|HK|(?i)HongKong"}
+
+  # 🧊 ���湾节点
+  - {name: 🧊台湾节点, <<: *Lucky4, filter: "台湾|湾|TW|(?i)Taiwan"}
+
+  # 🧊 日本节点
+  - {name: 🧊日本节点, <<: *Lucky4, filter: "日本|日|JP|(?i)Japan"}
+
+  # 🧊 韩国节点
+  - {name: 🧊韩国节点, <<: *Lucky4, filter: "韩国|韩|KR|(?i)SouthKorea"}
+
+  # 🧊 新加坡节点
+  - {name: 🧊新加坡节点, <<: *Lucky4, filter: "新加坡|狮|SG|(?i)Singapore"}
+
+  # 🧊 美国节点
+  - {name: 🧊美国节点, <<: *Lucky4, filter: "美国|美|US|(?i)UnitedStates"}
+
+
+# ========================================================================================================
+# [16] 规则提供者 - 定义规则数据源
+# ========================================================================================================
+rule-providers:
+
+  # 自定义直连规则（本地文件）
+  我的直连:
+    <<: *Lucky7
+    path: ./Ruleset/DirectMyself.yaml
+    # 使用场景：添加不需要代理的域名或 IP
+
+  # 自定义代理规则（本地文件）
+  我的代理:
+    <<: *Lucky7
+    path: ./Ruleset/ProxyMyself.yaml
+    # 使用场景：添加需要代理的域名或 IP
+
+  # 规则修正 - 修复某些规则冲突
+  规则修正:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Unbreak.yaml
+    path: ./Ruleset/Unbreak.yaml
+
+  # 广告拦截 - 屏蔽广告和恶意网址
+  广告拦截:
+    <<: *Lucky5
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Advertising.yaml
+    path: ./Ruleset/Advertising.yaml
+
+  # 国外视频 - YouTube、Netflix 等流媒体服务
+  国外视频:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/GlobalMedia.yaml
+    path: ./Ruleset/GlobalMedia.yaml
+
+  # 哔哩哔哩 - 国内视频平台
+  哔哩哔哩:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/HMTMedia.yaml
+    path: ./Ruleset/HMTMedia.yaml
+
+  # 国内视频 - 腾讯视频、爱奇艺、优酷等
+  国内视频:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/ChinaMedia.yaml
+    path: ./Ruleset/ChinaMedia.yaml
+
+  # 国外网站 - 除视频外的其他国外网站
+  国外网站:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Global.yaml
+    path: ./Ruleset/Global.yaml
+
+  # 国内网站 - 通过 GeoIP 识别的国内网站
+  国内网站:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/GEOIPCN.yaml
+    path: ./Ruleset/GEOIPCN.yaml
+
+  # 苹果服务 - Apple 相关服务
+  苹果服务:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Apple.yaml
+    path: ./Ruleset/Apple.yaml
+
+  # 局域网络 - 本地网络和私有 IP
+  局域网络:
+    <<: *Lucky6
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/LAN.yaml
+    path: ./Ruleset/LAN.yaml
+
+
+# ========================================================================================================
+# [17] 路由规则 - 确定流量走向
+# ========================================================================================================
+# ⚠️ 规则优先级从上到下，匹配到某个规则后就会停止检查后续规则
+# 📌 最常见的目标：
+#    - DIRECT: 直接连接（不走代理）
+#    - REJECT: 拒绝连接（通常用于广告）
+#    - 策略组名称: 使用该策略组中的代理
+
+rules:
+  # 🔴 优先级 1：规则修正 - 必须放在最前面以修复冲突
+  - RULE-SET, 规则修正, DIRECT
+
+  # 🔴 优先级 2：广告拦截
+  - RULE-SET, 广告拦截, REJECT
+
+  # 🟡 优先级 3：本地自定义规则
+  - RULE-SET, 我的直连, DIRECT        # 自定义的不代理域名
+  - RULE-SET, 我的代理, 🌏国外网站    # 自定义的需要代理的域名
+
+  # 🟡 优先级 4：局域网络和特殊服务
+  - RULE-SET, 局域网络, DIRECT
+
+  # 🟡 优先级 5：特定服务分流
+  - RULE-SET, 苹果服务, 🍎苹果服务   # Apple 服务单独处理
+  - RULE-SET, 国外视频, 💽国外视频   # 国外视频使用国外视频策略
+  - RULE-SET, 哔哩哔哩, 📹哔哩哔哩   # B 站使用专属策略
+  - RULE-SET, 国内视频, 🟢国内视频   # 国内视频使用国内策略
+
+  # 🟡 优先级 6：国外网站（非视频）
+  - RULE-SET, 国外网站, 🌏国外网站
+
+  # 🟢 优先级 7：国内网站和其他
+  - RULE-SET, 国内网站, DIRECT        # 国内网站直接连接
+
+  # 🔴 优先级 8：默认规则（最后一条，捕获所有未匹配的流量）
+  - MATCH, 💖法外狂徒                 # 其他流量使用默认策略
+
+# ========================================================================================================
+# 配置说明
+# ========================================================================================================
+# 
+# 📌 快速配置检查清单：
+# 
+# ✅ 第 95 行：替换 proxy-providers 中的 url 为你的 Sub-Store 订阅链接
+# ✅ Tun 功能：根据系统选择合适的 stack（Windows: gvisor, macOS: gvisor, Linux: system）
+# ✅ DNS 功能：默认启用，如有问题可在应用设置中关闭
+# ✅ Sniffer 功能：默认启用，可提高应用识别率
+# ✅ 规则优先级：按照上述顺序，不建议修改
+# ✅ 节点过滤：确保订阅中的节点名称包含相应关键词（如 "HK"、"US"、"JP" 等）
+# 
+# 🔧 高级优化建议：
+# 
+# 1. DNS 性能优化：
+#    - 如果国内 DNS 解析速度慢，改用阿里或腾讯的 DoH：
+#      nameserver: [https://doh.pub/dns-query, https://dns.alidns.com/dns-query]
+# 
+# 2. Tun 兼容性：
+#    - 如果 Tun 启用后连接有问题，改为 stack: gvisor 或 mixed
+# 
+# 3. 规则自定义：
+#    - 在 ./Ruleset/DirectMyself.yaml 和 ./Ruleset/ProxyMyself.yaml 中添加自定义规则
+# 
+# 4. 代理性能：
+#    - 增加 tolerance: 100 可以减少节点切换频率
+#    - 调整 url-test interval 可以改变检查频率
+# 
+# ========================================================================================================
