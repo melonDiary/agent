@@ -1,0 +1,409 @@
+# ========================================================================================================
+# 配置名称: Clash 配置 - 优化版（无代理提供者）
+# 配置作者: Lucky (修订版本)
+# 最后更新: 2026-03-05
+#
+# 📌 使用说明：
+# 这是一个优化的基础配置，不包含代理提供者配置
+# 使用时需要通过 Sparkle 的订阅管理功能添加代理
+# ========================================================================================================
+
+# ========================================================================================================
+# [1] 端口配置 - Clash 监听端口
+# ========================================================================================================
+port: 7890
+socks-port: 7891
+redir-port: 7892
+mixed-port: 7893
+tproxy-port: 7894
+
+# ========================================================================================================
+# [2] 核心控制 - 基础代理设置
+# ========================================================================================================
+allow-lan: true
+bind-address: "0.0.0.0"
+find-process-mode: strict
+ipv6: false
+mode: rule
+log-level: info
+
+# ========================================================================================================
+# [3] 外部控制 - API 和 UI 访问
+# ========================================================================================================
+external-controller: 0.0.0.0:9093
+external-ui: ui
+external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/main.zip"
+secret: ""
+
+# ========================================================================================================
+# [4] TLS 指纹 - 用于绕过 SNI 阻断
+# ========================================================================================================
+global-client-fingerprint: chrome
+
+# ========================================================================================================
+# [5] Meta 专属配置 - Mihomo 特有功能
+# ========================================================================================================
+geodata-mode: false
+geodata-loader: standard
+unified-delay: true
+tcp-concurrent: true
+
+# ========================================================================================================
+# [6] 性能和连接优化
+# ========================================================================================================
+keep-alive-interval: 30
+keep-alive-idle: 600
+tcp-keep-alive: true
+connection-timeout: 5000
+read-timeout: 5000
+write-timeout: 5000
+dial-timeout: 10000
+disable-keep-alive: false
+
+# ========================================================================================================
+# [7] 地理数据库配置 - 定期更新 GeoIP/GeoSite 数据
+# ========================================================================================================
+geo-auto-update: true
+geo-update-interval: 24
+
+geox-url:
+  geoip: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geoip.dat"
+  geosite: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geosite.dat"
+  mmdb: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/country.mmdb"
+  asn: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/GeoLite2-ASN.mmdb"
+
+# ========================================================================================================
+# [8] 配置持久化 - 保存状态信息
+# ========================================================================================================
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+# ========================================================================================================
+# [9] 域名嗅探 - 自动识别应用访问的域名
+# ========================================================================================================
+sniffer:
+  enable: true
+  parse-pure-ip: true
+  override-destination: true
+  sniff:
+    TLS:
+      ports: [443, 8443]
+    HTTP:
+      ports: [80, 8080-8880]
+    QUIC:
+      ports: [443, 8443]
+
+# ========================================================================================================
+# [10] 虚拟网卡 (Tun) 配置 - 全局网络流量拦截
+# ========================================================================================================
+tun:
+  enable: true
+  stack: mixed
+  dns-hijack:
+    - 'any:53'
+  auto-route: true
+  auto-detect-interface: true
+
+# ========================================================================================================
+# [11] DNS 配置 - 域名解析和 Fake-IP 设置
+# ========================================================================================================
+dns:
+  enable: true
+  ipv6: false
+  prefer-h3: false
+  enhanced-mode: fake-ip
+  listen: 0.0.0.0:53
+  fake-ip-range: 198.18.0.1/16
+
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+
+  fake-ip-filter:
+    - '*.lan'
+    - 'localhost.localdomain'
+    - '*.local'
+    - 'cable.auth.com'
+    - '*.msftconnecttest.com'
+    - '*.msftncsi.com'
+    - 'network-test.debian.org'
+    - 'detectportal.firefox.com'
+    - 'resolver1.opendns.com'
+    - '*.srv.nintendo.net'
+    - '*.stun.playstation.net'
+    - 'xbox.*.microsoft.com'
+    - '*.xboxlive.com'
+    - 'stun.*'
+    - 'global.turn.twilio.com'
+    - 'global.stun.twilio.com'
+    - 'localhost.*.qq.com'
+    - 'localhost.*.weixin.qq.com'
+    - '*.logon.battlenet.com.cn'
+    - '*.logon.battle.net'
+    - '*.blzstatic.cn'
+    - 'music.163.com'
+    - '*.music.163.com'
+    - '*.126.net'
+    - 'musicapi.taihe.com'
+    - 'music.taihe.com'
+    - 'songsearch.kugou.com'
+    - 'trackercdn.kugou.com'
+    - '*.kuwo.cn'
+    - 'api-jooxtt.sanook.com'
+    - 'api.joox.com'
+    - 'joox.com'
+    - 'y.qq.com'
+    - '*.y.qq.com'
+    - 'streamoc.music.tc.qq.com'
+    - 'mobileoc.music.tc.qq.com'
+    - 'isure.stream.qqmusic.qq.com'
+    - 'dl.stream.qqmusic.qq.com'
+    - 'aqqmusic.tc.qq.com'
+    - 'amobile.music.tc.qq.com'
+    - 'plus.music.163.com'
+    - '*.xiami.com'
+    - '*.music.migu.cn'
+    - 'music.migu.cn'
+    - 'proxy.golang.org'
+    - '*.mcdn.bilivideo.cn'
+    - '*.cmpassport.com'
+    - 'id6.me'
+    - 'open.e.189.cn'
+    - 'mdn.open.wo.cn'
+    - 'opencloud.wostore.cn'
+    - 'auth.wosms.cn'
+    - '*.jegotrip.com.cn'
+    - '*.icitymobile.mobi'
+    - '*.pingan.com.cn'
+    - '*.cmbchina.com'
+    - 'pool.ntp.org'
+    - '*.pool.ntp.org'
+    - 'ntp.*.com'
+    - 'time.*.com'
+    - 'ntp?.*.com'
+    - 'time?.*.com'
+    - 'time.*.gov'
+    - 'time.*.edu.cn'
+    - '*.ntp.org.cn'
+    - 'PDC._msDCS.*.*'
+    - 'DC._msDCS.*.*'
+    - 'GC._msDCS.*.*'
+    - 'stun.l.google.com'
+    - 'stun1.l.google.com'
+    - 'stun2.l.google.com'
+    - 'stun3.l.google.com'
+    - 'stun4.l.google.com'
+
+  nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+    - 223.5.5.5
+    - 119.29.29.29
+
+  fallback:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+    - https://1.1.1.1/dns-query
+    - tls://8.8.8.8:853
+
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+      - 0.0.0.0/32
+
+# ========================================================================================================
+# [12] 策略组定义 - 代理选择
+# ========================================================================================================
+# 注意：此配置不包含代理提供者，代理需要通过 Sparkle 订阅管理添加
+# 策略组会自动包含所有可用代理（include-all: true）
+
+proxy-groups:
+  - name: 💖网速超快
+    type: select
+    include-all: true
+
+  - name: 🟡延迟优选
+    type: url-test
+    include-all: true
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+  - name: 🍎苹果服务
+    type: select
+    include-all: true
+
+  - name: 📹哔哩哔哩
+    type: select
+    include-all: true
+
+  - name: 🟢国内视频
+    type: select
+    include-all: true
+
+  - name: 💽国外视频
+    type: select
+    include-all: true
+
+  - name: 🌏国外网站
+    type: select
+    include-all: true
+
+  - name: 💖法外狂徒
+    type: select
+    include-all: true
+
+  - name: 🧊香港节点
+    type: url-test
+    include-all: true
+    filter: "香港|港|HK|(?i)HongKong"
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+  - name: 🧊台湾节点
+    type: url-test
+    include-all: true
+    filter: "台湾|湾|TW|(?i)Taiwan"
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+  - name: 🧊日本节点
+    type: url-test
+    include-all: true
+    filter: "日本|日|JP|(?i)Japan"
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+  - name: 🧊韩国节点
+    type: url-test
+    include-all: true
+    filter: "韩国|韩|KR|(?i)SouthKorea"
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+  - name: 🧊新加坡节点
+    type: url-test
+    include-all: true
+    filter: "新加坡|狮|SG|(?i)Singapore"
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+  - name: 🧊美国节点
+    type: url-test
+    include-all: true
+    filter: "美国|美|US|(?i)UnitedStates"
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+# ========================================================================================================
+# [13] 规则提供者 - 定义规则数据源
+# ========================================================================================================
+rule-providers:
+  我的直连:
+    type: file
+    behavior: classical
+    path: ./Ruleset/DirectMyself.yaml
+    interval: 86400
+
+  我的代理:
+    type: file
+    behavior: classical
+    path: ./Ruleset/ProxyMyself.yaml
+    interval: 86400
+
+  规则修正:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Unbreak.yaml
+    path: ./Ruleset/Unbreak.yaml
+    interval: 86400
+
+  广告拦截:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Advertising.yaml
+    path: ./Ruleset/Advertising.yaml
+    interval: 86400
+
+  国外视频:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/GlobalMedia.yaml
+    path: ./Ruleset/GlobalMedia.yaml
+    interval: 86400
+
+  哔哩哔哩:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/HMTMedia.yaml
+    path: ./Ruleset/HMTMedia.yaml
+    interval: 86400
+
+  国内视频:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/ChinaMedia.yaml
+    path: ./Ruleset/ChinaMedia.yaml
+    interval: 86400
+
+  国外网站:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Global.yaml
+    path: ./Ruleset/Global.yaml
+    interval: 86400
+
+  国内网站:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/GEOIPCN.yaml
+    path: ./Ruleset/GEOIPCN.yaml
+    interval: 86400
+
+  苹果服务:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/Apple.yaml
+    path: ./Ruleset/Apple.yaml
+    interval: 86400
+
+  局域网络:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/melonDiary/agent/refs/heads/main/mihomo/Rules/LAN.yaml
+    path: ./Ruleset/LAN.yaml
+    interval: 86400
+
+# ========================================================================================================
+# [14] 路由规则 - 确定流量走向
+# ========================================================================================================
+rules:
+  - RULE-SET, 规则修正, DIRECT
+  - RULE-SET, 广告拦截, REJECT
+  - RULE-SET, 我的直连, DIRECT
+  - RULE-SET, 我的代理, 🌏国外网站
+  - RULE-SET, 局域网络, DIRECT
+  - RULE-SET, 苹果服务, 🍎苹果服务
+  - RULE-SET, 国外视频, 💽国外视频
+  - RULE-SET, 哔哩哔哩, 📹哔哩哔哩
+  - RULE-SET, 国内视频, 🟢国内视频
+  - RULE-SET, 国外网站, 🌏国外网站
+  - RULE-SET, 国内网站, DIRECT
+  - GEOIP, CN, DIRECT
+  - MATCH, 💖法外狂徒
