@@ -5,6 +5,8 @@ DOMAIN,bdtj.tagtic.cn
 # > Alibaba
 DOMAIN,log.mmstat.com
 DOMAIN,sycm.mmstat.com
+host-suffix,quark.cn
+
 # ---(Alphabet)---
 DOMAIN-SUFFIX,blog.google
 DOMAIN,ci.android.com
@@ -27,3 +29,7 @@ DOMAIN,analytics.strava.com
 # > Umeng
 DOMAIN,msg.umeng.com
 DOMAIN,msg.umengcloud.com
+
+# > 小红书
+DOMAIN-SUFFIX,xhscdn.com
+DOMAIN-SUFFIX,xiaohongshu.com
