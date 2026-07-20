@@ -1,0 +1,4 @@
+GEOIP,FACEBOOK,proxy,no-resolve
+GEOIP,GOOGLE,proxy,no-resolve
+GEOIP,TELEGRAM,proxy,no-resolve
+GEOIP,NETFLIX,proxy,no-resolve

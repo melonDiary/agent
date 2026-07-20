@@ -568,5 +568,8 @@ DOMAIN-SUFFIX,paypal.me
 DOMAIN-SUFFIX,paypal-mktg.com
 DOMAIN-SUFFIX,paypalobjects.com
 
-# > Google
-GEOIP,GOOGLE
+# ---(Proxy+)---
+host, anyrouter.top, proxy
+host-suffix, madou.club, proxy
+host-suffix, ddgksf2013.top, proxy
+host, study.small1999.sbs, proxy

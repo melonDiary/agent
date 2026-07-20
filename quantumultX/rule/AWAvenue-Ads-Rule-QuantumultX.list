@@ -920,3 +920,4 @@ DOMAIN-KEYWORD,-ad.video.yximgs.com,reject
 DOMAIN-KEYWORD,-ad.wtzw.com,reject
 DOMAIN-KEYWORD,-be-pack-sign.pglstatp-toutiao.com,reject
 DOMAIN-KEYWORD,-normal.zijieapi.com,reject
+DOMAIN,msmp.abchina.com.cn,reject

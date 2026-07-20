@@ -61,3 +61,37 @@ DOMAIN,msg.umengcloud.com
 # > 小红书
 DOMAIN-SUFFIX,xhscdn.com
 DOMAIN-SUFFIX,xiaohongshu.com
+
+# ---(Direct+)---
+host, app-analytics-services.com, direct
+host, api.pingmeapp.net, direct
+host-suffix, 97img.com, direct
+host-suffix, deepseek.com, direct
+host-suffix, douyinvod.com, direct
+host-suffix, dpdns.org, direct
+host, ap-singapore-1.vds.qzz.io, direct
+host-suffix, wxscs.com, direct
+host-suffix, cdn2020.com, direct
+host-keyword, melondiary, direct
+host, url.v1.mk, direct
+host-suffix, pinduoduo.net, direct
+host-suffix, pddpic.com, direct
+host-suffix, pinduoduo.com, direct
+host, sub-store.vercel.app, direct
+host-keyword, cloudns, direct
+host, cf-workers-raw-aojs.pages.dev, direct
+host, card.hot-fan.com, direct
+host, www.gamer520.com, direct
+host, lucky.bingredtea.xyz, direct
+host, injections.adguard.org, direct
+host, sq.bls.mdt.qq.com, direct
+host-keyword, hneko, direct
+host-suffix, local, direct
+ip-cidr, 17.0.0.0/8, direct
+ip-cidr, 192.168.0.0/16, direct
+ip-cidr, 10.0.0.0/8, direct
+ip-cidr, 172.16.0.0/12, direct
+ip-cidr, 127.0.0.0/8, direct
+ip-cidr, 100.64.0.0/10, direct
+ip-cidr, 224.0.0.0/4, direct
+ip6-cidr, fe80::/10, direct

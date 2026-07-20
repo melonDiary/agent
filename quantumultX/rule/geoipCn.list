@@ -1,1 +1,2 @@
-geoip, cn
+GEOIP,PRIVATE,direct,no-resolve
+GEOIP,CN,direct,no-resolve
