@@ -1,5 +1,9 @@
 # 内容：Apple
 # 数量：29条
+host-suffix,time.apple.com
+host-suffix,time.asia.apple.com
+host-suffix,ocsp.apple.com
+host-suffix,ocsp2.apple.com
 DOMAIN,apple.comscoreresearch.com
 DOMAIN-SUFFIX,aaplimg.com
 DOMAIN-SUFFIX,akadns.net
